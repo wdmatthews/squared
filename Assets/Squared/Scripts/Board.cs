@@ -55,17 +55,21 @@ namespace Squared
         private void PlaceInitialTiles()
         {
             // TEMPORARY LOGIC; REPLACE LATER
-            for (int i = 0; i < 4; i++)
-            {
-                Vector2Int position = new Vector2Int(Random.Range(0, _boardSize.x), Random.Range(0, _boardSize.y));
+            //for (int i = 0; i < 4; i++)
+            //{
+            //    Vector2Int position = new Vector2Int(Random.Range(0, _boardSize.x), Random.Range(0, _boardSize.y));
 
-                while (_tilesByPosition.ContainsKey(position))
-                {
-                    position = new Vector2Int(Random.Range(0, _boardSize.x), Random.Range(0, _boardSize.y));
-                }
+            //    while (_tilesByPosition.ContainsKey(position))
+            //    {
+            //        position = new Vector2Int(Random.Range(0, _boardSize.x), Random.Range(0, _boardSize.y));
+            //    }
 
-                PlaceTile(_tileSOs[0], position);
-            }
+            //    PlaceTile(_tileSOs[0], position);
+            //}
+            PlaceTile(_tileSOs[0], new Vector2Int(0, 0));
+            PlaceTile(_tileSOs[0], new Vector2Int(1, 1));
+            PlaceTile(_tileSOs[0], new Vector2Int(2, 2));
+            PlaceTile(_tileSOs[0], new Vector2Int(3, 3));
         }
 
         private Vector3 BoardToWorldPosition(Vector2Int boardPosition)
@@ -111,27 +115,50 @@ namespace Squared
         #region Public Methods
         public void SlideTiles(Vector2Int direction)
         {
-            foreach (var tile in _tiles)
+            List<Tile> movableTiles = new List<Tile>(_tiles);
+            int slideIteration = 0;
+
+            for (int i = movableTiles.Count - 1; i >= -1; i--)
             {
-                Vector2Int position = tile.BoardPosition;
-                Vector2Int nextPosition = position + direction;
+                if (movableTiles.Count == 1) i = 0;
+                Tile tile = movableTiles[i];
+                if (slideIteration == 0) tile.NextBoardPosition = tile.BoardPosition + direction;
 
-                while (nextPosition.x >= 0 && nextPosition.x < _boardSize.x
-                    && nextPosition.y >= 0 && nextPosition.y < _boardSize.y)
+                if (tile.NextBoardPosition.x >= 0 && tile.NextBoardPosition.x < _boardSize.x
+                    && tile.NextBoardPosition.y >= 0 && tile.NextBoardPosition.y < _boardSize.y)
                 {
-                    position = nextPosition;
-                    nextPosition += direction;
-                }
-
-                if (_tilesByPosition.ContainsKey(position))
-                {
-                    Debug.Log("Merge");
+                    if (_tilesByPosition.ContainsKey(tile.NextBoardPosition))
+                    {
+                        Debug.Log($"Attempt merge with tile at {tile.NextBoardPosition}");
+                        movableTiles.RemoveAt(i);
+                    }
+                    else
+                    {
+                        _tilesByPosition.Remove(tile.BoardPosition);
+                        tile.BoardPosition = tile.NextBoardPosition;
+                        _tilesByPosition.Add(tile.BoardPosition, tile);
+                        tile.NextBoardPosition += direction;
+                    }
                 }
                 else
                 {
-                    _tilesByPosition.Remove(tile.BoardPosition);
-                    tile.Move(BoardToWorldPosition(position), position);
-                    _tilesByPosition.Add(position, tile);
+                    movableTiles.RemoveAt(i);
+                }
+
+                if (i == 0)
+                {
+                    slideIteration++;
+                    int movableCount = movableTiles.Count;
+                    if (movableCount > 0) i = movableCount - 1;
+                    else break;
+                }
+            }
+
+            foreach (var tile in _tiles)
+            {
+                if (tile.BoardPosition != tile.NextBoardPosition)
+                {
+                    tile.Move(BoardToWorldPosition(tile.BoardPosition), tile.BoardPosition);
                 }
             }
         }

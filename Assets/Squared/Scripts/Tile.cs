@@ -34,7 +34,8 @@ namespace Squared
                 _label.text = $"{_data.BaseNumber}";
             }
         }
-        public Vector2Int BoardPosition { get; protected set; }
+        public Vector2Int BoardPosition { get; set; }
+        public Vector2Int NextBoardPosition { get; set; }
         #endregion
 
         #region Protected Methods
