@@ -16,6 +16,8 @@ namespace Squared
         #region Runtime Fields
         private Vector3 _worldZeroPosition = new Vector3(-1.5f, -1.5f);
         private Dictionary<int, TileSO> _tileSOsByBaseNumber = new Dictionary<int, TileSO>();
+        private List<Tile> _tiles = new List<Tile>();
+        private Dictionary<Vector2Int, Tile> _tilesByPosition = new Dictionary<Vector2Int, Tile>();
         #endregion
 
         #region Properties
@@ -46,6 +48,16 @@ namespace Squared
                 _tileSOsByBaseNumber.Add(tileSO.BaseNumber, tileSO);
             }
         }
+
+        private void PlaceTile(TileSO tileSO, Vector2Int position)
+        {
+
+        }
+
+        private void MergeTiles(List<Tile> tiles)
+        {
+
+        }
         #endregion
 
         #region Public Methods
@@ -63,6 +75,11 @@ namespace Squared
                 Mathf.RoundToInt(worldPosition.x - _worldZeroPosition.x),
                 Mathf.RoundToInt(worldPosition.y - _worldZeroPosition.y)
             );
+        }
+
+        public void SlideTiles(Vector2Int direction)
+        {
+            
         }
         #endregion
     }
