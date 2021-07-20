@@ -335,6 +335,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53463e83e75cf477c9ca3f56fa7c5118, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _renderer: {fileID: 1241707425}
+  _gridSize: {x: 4, y: 4}
 --- !u!1 &1455644502
 GameObject:
   m_ObjectHideFlags: 0
@@ -432,6 +434,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce7a7139595974d9d86be4678b3e5978, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _renderer: {fileID: 1455644503}
+  _label: {fileID: 2041265846}
 --- !u!1 &2041265844
 GameObject:
   m_ObjectHideFlags: 0
