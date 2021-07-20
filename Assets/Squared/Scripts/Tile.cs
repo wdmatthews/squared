@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using DG.Tweening;
 
 namespace Squared
 {
@@ -11,6 +12,8 @@ namespace Squared
         [SerializeField] protected SpriteRenderer _renderer = null;
         [SerializeField] protected TextMeshPro _label = null;
         [SerializeField] protected Sprite[] _powerSprites = { };
+        [SerializeField] protected float _placeAnimationDuration = 1;
+        [SerializeField] protected float _placeAnimationScale = 1.1f;
         #endregion
 
         #region Runtime Fields
@@ -19,10 +22,10 @@ namespace Squared
         #endregion
 
         #region Properties
-        protected TileSO Data
+        public TileSO Data
         {
             get => _data;
-            set
+            protected set
             {
                 _data = value;
                 _power = 1;
@@ -30,6 +33,7 @@ namespace Squared
                 _label.text = $"{_data.BaseNumber}";
             }
         }
+        public Vector2Int BoardPosition { get; protected set; }
         #endregion
 
         #region Protected Methods
@@ -50,6 +54,17 @@ namespace Squared
             }
 
             return result;
+        }
+        #endregion
+
+        #region Public Methods
+        public void Place(Vector3 worldPosition, TileSO data, Vector2Int boardPosition)
+        {
+            transform.position = worldPosition;
+            Data = data;
+            BoardPosition = boardPosition;
+            gameObject.SetActive(true);
+            transform.DOScale(1, _placeAnimationDuration).From(_placeAnimationScale);
         }
         #endregion
     }

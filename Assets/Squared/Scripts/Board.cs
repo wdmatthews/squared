@@ -18,6 +18,7 @@ namespace Squared
         private Dictionary<int, TileSO> _tileSOsByBaseNumber = new Dictionary<int, TileSO>();
         private List<Tile> _tiles = new List<Tile>();
         private Dictionary<Vector2Int, Tile> _tilesByPosition = new Dictionary<Vector2Int, Tile>();
+        private Dictionary<TileSO, Stack<Tile>> _inactiveTiles = new Dictionary<TileSO, Stack<Tile>>();
         #endregion
 
         #region Properties
@@ -34,9 +35,10 @@ namespace Squared
         #endregion
 
         #region Unity Methods
-        private void Awake()
+        private void Start()
         {
             ReadTileSOs();
+            PlaceInitialTiles();
         }
         #endregion
 
@@ -46,12 +48,58 @@ namespace Squared
             foreach (var tileSO in _tileSOs)
             {
                 _tileSOsByBaseNumber.Add(tileSO.BaseNumber, tileSO);
+                _inactiveTiles.Add(tileSO, new Stack<Tile>());
             }
+        }
+
+        private void PlaceInitialTiles()
+        {
+            // TEMPORARY LOGIC; REPLACE LATER
+            for (int i = 0; i < 4; i++)
+            {
+                Vector2Int position = new Vector2Int(Random.Range(0, _boardSize.x), Random.Range(0, _boardSize.y));
+
+                while (_tilesByPosition.ContainsKey(position))
+                {
+                    position = new Vector2Int(Random.Range(0, _boardSize.x), Random.Range(0, _boardSize.y));
+                }
+
+                PlaceTile(_tileSOs[0], position);
+            }
+        }
+
+        private Vector3 BoardToWorldPosition(Vector2Int boardPosition)
+        {
+            return new Vector3(
+                boardPosition.x + _worldZeroPosition.x,
+                boardPosition.y + _worldZeroPosition.y
+            );
+        }
+
+        private Vector2Int WorldToBoardPosition(Vector3 worldPosition)
+        {
+            return new Vector2Int(
+                Mathf.RoundToInt(worldPosition.x - _worldZeroPosition.x),
+                Mathf.RoundToInt(worldPosition.y - _worldZeroPosition.y)
+            );
         }
 
         private void PlaceTile(TileSO tileSO, Vector2Int position)
         {
+            Tile tile = null;
 
+            if (_inactiveTiles[tileSO].Count > 0)
+            {
+                tile = _inactiveTiles[tileSO].Pop();
+            }
+            else
+            {
+                tile = Instantiate(tileSO.Prefab, transform);
+            }
+
+            tile.Place(BoardToWorldPosition(position), tileSO, position);
+            _tiles.Add(tile);
+            _tilesByPosition[position] = tile;
         }
 
         private void MergeTiles(List<Tile> tiles)
@@ -61,22 +109,6 @@ namespace Squared
         #endregion
 
         #region Public Methods
-        public Vector3 BoardToWorldPosition(Vector2Int boardPosition)
-        {
-            return new Vector3(
-                boardPosition.x + _worldZeroPosition.x,
-                boardPosition.y + _worldZeroPosition.y
-            );
-        }
-
-        public Vector2Int WorldToBoardPosition(Vector3 worldPosition)
-        {
-            return new Vector2Int(
-                Mathf.RoundToInt(worldPosition.x - _worldZeroPosition.x),
-                Mathf.RoundToInt(worldPosition.y - _worldZeroPosition.y)
-            );
-        }
-
         public void SlideTiles(Vector2Int direction)
         {
             

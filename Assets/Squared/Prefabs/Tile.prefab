@@ -218,6 +218,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _renderer: {fileID: 1959014139329216650}
   _label: {fileID: 1959014138642948459}
+  _powerSprites:
+  - {fileID: 21300000, guid: affd4f1e182df4358aed20671558c5eb, type: 3}
+  - {fileID: 21300000, guid: cf8ca308a2cb54bc3ad7b7019b0a53f1, type: 3}
+  - {fileID: 21300000, guid: 61487ad170d854774848ed64bc397379, type: 3}
+  - {fileID: 21300000, guid: 2d30765494fe34900b24a6cfe40df4fa, type: 3}
+  _placeAnimationDuration: 0.2
+  _placeAnimationScale: 1.1428572
 --- !u!212 &1959014139329216650
 SpriteRenderer:
   m_ObjectHideFlags: 0
