@@ -9,9 +9,16 @@
 /[Bb]uilds/
 /[Ll]ogs/
 /[Mm]emoryCaptures/
+/[Uu]serSettings/
+
+Assets/TextMesh Pro/
+Assets/Squared/Artwork/
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
+
+Assets/TextMesh Pro.meta
+Assets/Squared/Artwork.meta
 
 # Uncomment this line if you wish to ignore the asset store tools plugin
 # /[Aa]ssets/AssetStoreTools*
@@ -21,6 +28,8 @@
 
 # Visual Studio cache directory
 .vs/
+.vsconfig
+.DS_Store
 
 # Gradle cache directory
 .gradle/
