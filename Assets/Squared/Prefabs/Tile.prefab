@@ -225,6 +225,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 2d30765494fe34900b24a6cfe40df4fa, type: 3}
   _placeAnimationDuration: 0.2
   _placeAnimationScale: 1.1428572
+  _moveAnimationDuration: 0.15
 --- !u!212 &1959014139329216650
 SpriteRenderer:
   m_ObjectHideFlags: 0

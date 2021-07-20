@@ -14,6 +14,7 @@ namespace Squared
         [SerializeField] protected Sprite[] _powerSprites = { };
         [SerializeField] protected float _placeAnimationDuration = 1;
         [SerializeField] protected float _placeAnimationScale = 1.1f;
+        [SerializeField] protected float _moveAnimationDuration = 1;
         #endregion
 
         #region Runtime Fields
@@ -65,6 +66,12 @@ namespace Squared
             BoardPosition = boardPosition;
             gameObject.SetActive(true);
             transform.DOScale(1, _placeAnimationDuration).From(_placeAnimationScale);
+        }
+
+        public void Move(Vector3 worldPosition, Vector2Int boardPosition)
+        {
+            BoardPosition = boardPosition;
+            transform.DOMove(worldPosition, _moveAnimationDuration);
         }
         #endregion
     }

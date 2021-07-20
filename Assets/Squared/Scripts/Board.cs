@@ -111,7 +111,29 @@ namespace Squared
         #region Public Methods
         public void SlideTiles(Vector2Int direction)
         {
-            
+            foreach (var tile in _tiles)
+            {
+                Vector2Int position = tile.BoardPosition;
+                Vector2Int nextPosition = position + direction;
+
+                while (nextPosition.x >= 0 && nextPosition.x < _boardSize.x
+                    && nextPosition.y >= 0 && nextPosition.y < _boardSize.y)
+                {
+                    position = nextPosition;
+                    nextPosition += direction;
+                }
+
+                if (_tilesByPosition.ContainsKey(position))
+                {
+                    Debug.Log("Merge");
+                }
+                else
+                {
+                    _tilesByPosition.Remove(tile.BoardPosition);
+                    tile.Move(BoardToWorldPosition(position), position);
+                    _tilesByPosition.Add(position, tile);
+                }
+            }
         }
         #endregion
     }

@@ -94,8 +94,8 @@ namespace Squared
             _rightArrowKeyWasPressed = rightArrowKeyIsPressed;
             _downArrowKeyWasPressed = downArrowKeyIsPressed;
             _upArrowKeyWasPressed = upArrowKeyIsPressed;
-            if (!mouseIsPressed && _mouseWasPressed) _lastMousePosition = mousePosition;
-            if (!screenIsTouched && _screenWasTouched) _lastTouchPosition = touchPosition;
+            if (mouseIsPressed != _mouseWasPressed) _lastMousePosition = mousePosition;
+            if (screenIsTouched != _screenWasTouched) _lastTouchPosition = touchPosition;
             _mouseWasPressed = mouseIsPressed;
             _screenWasTouched = screenIsTouched;
         }
