@@ -22,6 +22,7 @@ namespace Squared
 
         #region Runtime Fields
         protected TileSO _data = null;
+        protected int _baseNumber = 2;
         #endregion
 
         #region Properties
@@ -31,6 +32,7 @@ namespace Squared
             protected set
             {
                 _data = value;
+                _baseNumber = _data.BaseNumber;
                 Power = 1;
                 NextPower = 1;
                 RemoveAfterMove = false;
@@ -88,8 +90,9 @@ namespace Squared
             }
 
             Power = power;
+            _baseNumber = Pow(_baseNumber, 2);
             _renderer.sprite = _powerSprites[Power - 1];
-            _label.text = $"{Pow(_data.BaseNumber, Power)}";
+            _label.text = $"{_baseNumber}";
             transform.DOScale(_mergeAnimationScale, _mergeAnimationDuration / 2)
                     .OnComplete(() => transform.DOScale(1, _mergeAnimationDuration / 2));
             return false;
