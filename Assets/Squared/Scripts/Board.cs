@@ -109,29 +109,49 @@ namespace Squared
         private void TrySlideTile(Vector2Int position, Vector2Int direction)
         {
             Tile tile = _tilesByPosition[position];
+            Tile tileToMergeWith = null;
             tile.NextBoardPosition = position;
             Vector2Int nextPosition = position + direction;
-            bool shouldMerge = false;
 
             while (nextPosition.x >= 0 && nextPosition.x < _boardSize.x
                 && nextPosition.y >= 0 && nextPosition.y < _boardSize.y)
             {
                 tile.NextBoardPosition = nextPosition;
+
                 if (_tilesByPosition.ContainsKey(nextPosition))
                 {
-                    Debug.Log("Attempt merge or stop");
-                    shouldMerge = true;
+                    Tile otherTile = _tilesByPosition[nextPosition];
+
+                    if (tile.Data.BaseNumber == otherTile.Data.BaseNumber && tile.NextPower == otherTile.NextPower)
+                    {
+                        tileToMergeWith = otherTile;
+                    }
+                    else tile.NextBoardPosition = nextPosition - direction;
+
                     break;
                 }
                 else nextPosition += direction;
             }
 
-            if (!shouldMerge)
+            _tilesByPosition.Remove(tile.BoardPosition);
+
+            if (tileToMergeWith)
             {
+                tile.RemoveAfterMove = true;
+                tileToMergeWith.NextPower++;
+                Vector3 mergePosition = tileToMergeWith.transform.position;
+                mergePosition.z = -tileToMergeWith.NextPower;
+                tileToMergeWith.transform.position = mergePosition;
+                _inactiveTiles[tile.Data].Push(tile);
                 _tilesByPosition.Remove(tile.BoardPosition);
-                tile.Move(BoardToWorldPosition(tile.NextBoardPosition), tile.NextBoardPosition);
-                _tilesByPosition.Add(tile.BoardPosition, tile);
+                _tiles.Remove(tile);
             }
+            else
+            {
+                _tilesByPosition.Add(tile.NextBoardPosition, tile);
+            }
+
+            tile.Move(BoardToWorldPosition(tile.NextBoardPosition), tile.NextBoardPosition);
         }
         #endregion
 
@@ -184,6 +204,14 @@ namespace Squared
                         if (!_tilesByPosition.ContainsKey(position)) continue;
                         TrySlideTile(position, direction);
                     }
+                }
+            }
+
+            foreach (var tile in _tiles)
+            {
+                if (tile.NextPower != tile.Power)
+                {
+                    tile.SetPower(tile.NextPower);
                 }
             }
 

@@ -33,14 +33,16 @@ namespace Squared
                 _data = value;
                 Power = 1;
                 NextPower = 1;
+                RemoveAfterMove = false;
                 _renderer.color = _data.Color;
                 _label.text = $"{_data.BaseNumber}";
             }
         }
         public Vector2Int BoardPosition { get; protected set; }
         public Vector2Int NextBoardPosition { get; set; }
-        public int Power { get; protected set; } = 1;
-        public int NextPower { get; set; } = 1;
+        public int Power { get; protected set; }
+        public int NextPower { get; set; }
+        public bool RemoveAfterMove { get; set; }
         #endregion
 
         #region Protected Methods
@@ -60,8 +62,9 @@ namespace Squared
         #region Public Methods
         public void Place(Vector3 worldPosition, TileSO data, Vector2Int boardPosition)
         {
-            transform.position = worldPosition;
             Data = data;
+            worldPosition.z = -Power;
+            transform.position = worldPosition;
             BoardPosition = boardPosition;
             gameObject.SetActive(true);
             transform.DOScale(1, _placeAnimationDuration).From(_placeAnimationScale);
@@ -69,8 +72,11 @@ namespace Squared
 
         public void Move(Vector3 worldPosition, Vector2Int boardPosition)
         {
+            var moveAnimation = boardPosition.x != BoardPosition.x
+                ? transform.DOMoveX(worldPosition.x, _moveAnimationDuration)
+                : transform.DOMoveY(worldPosition.y, _moveAnimationDuration);
             BoardPosition = boardPosition;
-            transform.DOMove(worldPosition, _moveAnimationDuration);
+            if (RemoveAfterMove) moveAnimation.OnComplete(Remove);
         }
 
         public bool SetPower(int power)
