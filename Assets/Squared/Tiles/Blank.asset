@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f88f82dc247c645468208769c8e2d38a, type: 3}
-  m_Name: 3
+  m_Name: Blank
   m_EditorClassIdentifier: 
-  BaseNumber: 3
-  Color: {r: 0, g: 0.5882353, b: 0.53333336, a: 1}
-  CanMerge: 1
+  BaseNumber: 0
+  Color: {r: 0.4745098, g: 0.33333334, b: 0.28235295, a: 1}
+  CanMerge: 0
   CanSlide: 1
-  Prefab: {fileID: 1959014139329216644, guid: b2acd7b8d47b340e8b8aed2e8577b88e, type: 3}
+  Prefab: {fileID: 1959014139329216644, guid: 2b45829cee6a9441c958f33cf0244074, type: 3}

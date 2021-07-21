@@ -49,6 +49,8 @@ MonoBehaviour:
   _tileSOs:
   - {fileID: 11400000, guid: d84fffdb44e0740be84c5a39499dfac2, type: 2}
   - {fileID: 11400000, guid: 20003444d903548de864cc317d0b91aa, type: 2}
+  - {fileID: 11400000, guid: 4d38e3cb1bea446dc8d1565f366db719, type: 2}
+  - {fileID: 11400000, guid: c7103e5fafa8c498db91f4f5140ebe2d, type: 2}
   _slideCooldown: 0.175
 --- !u!212 &666888664477080370
 SpriteRenderer:

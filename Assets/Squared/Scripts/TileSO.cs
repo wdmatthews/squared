@@ -7,6 +7,8 @@ namespace Squared
     {
         public int BaseNumber = 2;
         public Color Color = new Color(33 / 255f, 150 / 255f, 243 / 255f);
+        public bool CanMerge = true;
+        public bool CanSlide = true;
         public Tile Prefab = null;
     }
 }

@@ -74,9 +74,9 @@ namespace Squared
             //    PlaceTile(_tileSOs[0], position);
             //}
             PlaceTile(_tileSOs[0], new Vector2Int(0, 0));
-            PlaceTile(_tileSOs[0], new Vector2Int(1, 1));
-            PlaceTile(_tileSOs[1], new Vector2Int(2, 2));
-            PlaceTile(_tileSOs[1], new Vector2Int(3, 3));
+            PlaceTile(_tileSOs[1], new Vector2Int(1, 1));
+            PlaceTile(_tileSOs[2], new Vector2Int(2, 2));
+            PlaceTile(_tileSOs[3], new Vector2Int(3, 3));
         }
 
         private Vector3 BoardToWorldPosition(Vector2Int boardPosition)
@@ -116,6 +116,7 @@ namespace Squared
         private void TrySlideTile(Vector2Int position, Vector2Int direction)
         {
             Tile tile = _tilesByPosition[position];
+            if (!tile.Data.CanSlide) return;
             Tile tileToMergeWith = null;
             tile.NextBoardPosition = position;
             Vector2Int nextPosition = position + direction;
@@ -129,7 +130,8 @@ namespace Squared
                 {
                     Tile otherTile = _tilesByPosition[nextPosition];
 
-                    if (tile.Data.BaseNumber == otherTile.Data.BaseNumber && tile.NextPower == otherTile.NextPower)
+                    if (tile.Data.BaseNumber == otherTile.Data.BaseNumber && tile.NextPower == otherTile.NextPower
+                        && tile.Data.CanMerge && otherTile.Data.CanMerge)
                     {
                         tileToMergeWith = otherTile;
                     }
