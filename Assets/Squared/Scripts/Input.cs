@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 namespace Squared
 {
@@ -10,6 +11,12 @@ namespace Squared
         #region Inspector Fields
         [SerializeField] private Board _board = null;
         [SerializeField] private float _pointerMoveThreshold = 64;
+        [SerializeField] private Button _menuButton = null;
+        [SerializeField] private Button _retryButton = null;
+        [SerializeField] private Button _slideLeftButton = null;
+        [SerializeField] private Button _slideRightButton = null;
+        [SerializeField] private Button _slideDownButton = null;
+        [SerializeField] private Button _slideUpButton = null;
         #endregion
 
         #region Runtime Fields
@@ -29,6 +36,17 @@ namespace Squared
         #endregion
 
         #region Unity Methods
+        private void Awake()
+        {
+            // TODO Send to menu
+            _menuButton.onClick.AddListener(() => Debug.Log("Menu"));
+            _retryButton.onClick.AddListener(() => _board.Retry());
+            _slideLeftButton.onClick.AddListener(() => _board.SlideTiles(new Vector2Int(-1, 0)));
+            _slideRightButton.onClick.AddListener(() => _board.SlideTiles(new Vector2Int(1, 0)));
+            _slideDownButton.onClick.AddListener(() => _board.SlideTiles(new Vector2Int(0, -1)));
+            _slideUpButton.onClick.AddListener(() => _board.SlideTiles(new Vector2Int(0, 1)));
+        }
+
         private void Update()
         {
             bool aKeyIsPressed = Keyboard.current != null ? Keyboard.current.aKey.isPressed : false;
