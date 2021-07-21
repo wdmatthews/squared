@@ -10,10 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f88f82dc247c645468208769c8e2d38a, type: 3}
-  m_Name: Immovable
+  m_Name: Tile_2
   m_EditorClassIdentifier: 
-  BaseNumber: -1
-  Color: {r: 0.3764706, g: 0.49019608, b: 0.54509807, a: 1}
-  CanMerge: 0
-  CanSlide: 0
-  Prefab: {fileID: 1959014139329216644, guid: e9a6b41d1fa944f6f840c4d93be6f536, type: 3}
+  BaseNumber: 2
+  Color: {r: 0.12941177, g: 0.5882353, b: 0.9529412, a: 1}
+  Prefab: {fileID: 1959014139329216644, guid: 96607c5724a1c4626ad96985be994e60, type: 3}

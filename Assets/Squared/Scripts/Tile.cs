@@ -36,8 +36,6 @@ namespace Squared
                 Power = 1;
                 NextPower = 1;
                 RemoveAfterMove = false;
-                _renderer.color = _data.Color;
-                _label.text = $"{_data.BaseNumber}";
             }
         }
         public Vector2Int BoardPosition { get; protected set; }
@@ -69,7 +67,7 @@ namespace Squared
 
         public bool SetPower(int power)
         {
-            if (power >= _powerSprites.Length)
+            if (power > _powerSprites.Length)
             {
                 Remove();
                 return true;

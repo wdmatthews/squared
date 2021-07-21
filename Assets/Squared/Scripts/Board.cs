@@ -12,12 +12,13 @@ namespace Squared
         [SerializeField] private Vector2Int _boardSize = new Vector2Int(4, 4);
         [SerializeField] private TileSO[] _tileSOs = { };
         [SerializeField] private float _slideCooldown = 1;
+        [SerializeField] private LevelSO _levelSO = null;
         #endregion
 
         #region Runtime Fields
         private Vector3 _worldZeroPosition = new Vector3(-1.5f, -1.5f);
-        private Dictionary<int, TileSO> _tileSOsByBaseNumber = new Dictionary<int, TileSO>();
         private List<Tile> _tiles = new List<Tile>();
+        private List<Tile> _standardTiles = new List<Tile>();
         private Dictionary<Vector2Int, Tile> _tilesByPosition = new Dictionary<Vector2Int, Tile>();
         private Dictionary<TileSO, Stack<Tile>> _inactiveTiles = new Dictionary<TileSO, Stack<Tile>>();
         private float _slideCooldownTimer = 0;
@@ -40,7 +41,8 @@ namespace Squared
         private void Start()
         {
             ReadTileSOs();
-            PlaceInitialTiles();
+            // TEMPORARY: Depends on game mode
+            PlaceInitialTiles(_levelSO.Tilemap);
         }
 
         private void Update()
@@ -54,29 +56,26 @@ namespace Squared
         {
             foreach (var tileSO in _tileSOs)
             {
-                _tileSOsByBaseNumber.Add(tileSO.BaseNumber, tileSO);
                 _inactiveTiles.Add(tileSO, new Stack<Tile>());
             }
         }
 
-        private void PlaceInitialTiles()
+        private void PlaceInitialTiles(string tilemap)
         {
-            // TEMPORARY LOGIC; REPLACE LATER
-            //for (int i = 0; i < 4; i++)
-            //{
-            //    Vector2Int position = new Vector2Int(Random.Range(0, _boardSize.x), Random.Range(0, _boardSize.y));
+            string[] rows = tilemap.Split('\n');
+            int y = _boardSize.y - 1;
 
-            //    while (_tilesByPosition.ContainsKey(position))
-            //    {
-            //        position = new Vector2Int(Random.Range(0, _boardSize.x), Random.Range(0, _boardSize.y));
-            //    }
+            foreach (var row in rows)
+            {
+                for (int x = row.Length - 1; x >= 0; x--)
+                {
+                    string cell = $"{row[x]}";
+                    if (cell == " ") continue;
+                    PlaceTile(_tileSOs[int.Parse(cell)], new Vector2Int(x, y));
+                }
 
-            //    PlaceTile(_tileSOs[0], position);
-            //}
-            PlaceTile(_tileSOs[0], new Vector2Int(0, 0));
-            PlaceTile(_tileSOs[1], new Vector2Int(1, 1));
-            PlaceTile(_tileSOs[2], new Vector2Int(2, 2));
-            PlaceTile(_tileSOs[3], new Vector2Int(3, 3));
+                y--;
+            }
         }
 
         private Vector3 BoardToWorldPosition(Vector2Int boardPosition)
@@ -110,7 +109,22 @@ namespace Squared
 
             tile.Place(BoardToWorldPosition(position), tileSO, position);
             _tiles.Add(tile);
-            _tilesByPosition[position] = tile;
+            _tilesByPosition.Add(position, tile);
+            if (tile.Data.CanMerge) _standardTiles.Add(tile);
+        }
+
+        private void RemoveTile(Tile tile)
+        {
+            _inactiveTiles[tile.Data].Push(tile);
+            _tilesByPosition.Remove(tile.BoardPosition);
+            _tiles.Remove(tile);
+            if (tile.Data.CanMerge) _standardTiles.Remove(tile);
+
+            // TEMPORARY: Depends on game mode
+            if (_standardTiles.Count == 0)
+            {
+                Debug.Log("Level completed!");
+            }
         }
 
         private void TrySlideTile(Vector2Int position, Vector2Int direction)
@@ -144,23 +158,20 @@ namespace Squared
 
             _tilesByPosition.Remove(tile.BoardPosition);
 
-            if (tileToMergeWith)
-            {
-                tile.RemoveAfterMove = true;
-                tileToMergeWith.NextPower++;
-                Vector3 mergePosition = tileToMergeWith.transform.position;
-                mergePosition.z = -tileToMergeWith.NextPower;
-                tileToMergeWith.transform.position = mergePosition;
-                _inactiveTiles[tile.Data].Push(tile);
-                _tilesByPosition.Remove(tile.BoardPosition);
-                _tiles.Remove(tile);
-            }
-            else
-            {
-                _tilesByPosition.Add(tile.NextBoardPosition, tile);
-            }
+            if (tileToMergeWith) MergeTiles(tile, tileToMergeWith);
+            else _tilesByPosition.Add(tile.NextBoardPosition, tile);
 
             tile.Move(BoardToWorldPosition(tile.NextBoardPosition), tile.NextBoardPosition);
+        }
+
+        private void MergeTiles(Tile tile1, Tile tile2)
+        {
+            tile1.RemoveAfterMove = true;
+            tile2.NextPower++;
+            Vector3 mergePosition = tile2.transform.position;
+            mergePosition.z = -tile2.NextPower;
+            tile2.transform.position = mergePosition;
+            RemoveTile(tile1);
         }
         #endregion
 
@@ -219,11 +230,13 @@ namespace Squared
                 }
             }
 
-            foreach (var tile in _tiles)
+            for (int i = _tiles.Count - 1; i >= 0; i--)
             {
+                Tile tile = _tiles[i];
+
                 if (tile.NextPower != tile.Power)
                 {
-                    tile.SetPower(tile.NextPower);
+                    if (tile.SetPower(tile.NextPower)) RemoveTile(tile);
                 }
             }
         }

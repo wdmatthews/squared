@@ -10,8 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f88f82dc247c645468208769c8e2d38a, type: 3}
-  m_Name: 2
+  m_Name: Tile_3
   m_EditorClassIdentifier: 
-  BaseNumber: 2
-  Color: {r: 0.12941177, g: 0.5882353, b: 0.9529412, a: 1}
-  Prefab: {fileID: 1959014139329216644, guid: 96607c5724a1c4626ad96985be994e60, type: 3}
+  BaseNumber: 3
+  Color: {r: 0, g: 0.5882353, b: 0.53333336, a: 1}
+  CanMerge: 1
+  CanSlide: 1
+  Prefab: {fileID: 1959014139329216644, guid: b2acd7b8d47b340e8b8aed2e8577b88e, type: 3}
