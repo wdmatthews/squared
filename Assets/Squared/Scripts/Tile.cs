@@ -15,11 +15,13 @@ namespace Squared
         [SerializeField] protected float _placeAnimationDuration = 1;
         [SerializeField] protected float _placeAnimationScale = 1.1f;
         [SerializeField] protected float _moveAnimationDuration = 1;
+        [SerializeField] protected float _mergeAnimationDuration = 1;
+        [SerializeField] protected float _mergeAnimationScale = 1.1f;
+        [SerializeField] protected float _removeAnimationDuration = 1;
         #endregion
 
         #region Runtime Fields
         protected TileSO _data = null;
-        protected int _power = 1;
         #endregion
 
         #region Properties
@@ -29,23 +31,19 @@ namespace Squared
             protected set
             {
                 _data = value;
-                _power = 1;
+                Power = 1;
+                NextPower = 1;
                 _renderer.color = _data.Color;
                 _label.text = $"{_data.BaseNumber}";
             }
         }
         public Vector2Int BoardPosition { get; set; }
         public Vector2Int NextBoardPosition { get; set; }
+        public int Power { get; protected set; } = 1;
+        public int NextPower { get; set; } = 1;
         #endregion
 
         #region Protected Methods
-        protected void IncreasePower()
-        {
-            _renderer.sprite = _powerSprites[_power];
-            _power++;
-            _label.text = $"{Pow(_data.BaseNumber, _power)}";
-        }
-
         protected int Pow(int baseNumber, int power)
         {
             int result = baseNumber;
@@ -73,6 +71,28 @@ namespace Squared
         {
             BoardPosition = boardPosition;
             transform.DOMove(worldPosition, _moveAnimationDuration);
+        }
+
+        public bool SetPower(int power)
+        {
+            if (power >= _powerSprites.Length)
+            {
+                Remove();
+                return true;
+            }
+
+            Power = power;
+            _renderer.sprite = _powerSprites[Power - 1];
+            _label.text = $"{Pow(_data.BaseNumber, Power)}";
+            transform.DOScale(_mergeAnimationScale, _mergeAnimationDuration / 2)
+                    .OnComplete(() => transform.DOScale(1, _mergeAnimationDuration / 2));
+            return false;
+        }
+
+        public void Remove()
+        {
+            transform.DOScale(0, _removeAnimationDuration)
+                .OnComplete(() => gameObject.SetActive(false));
         }
         #endregion
     }

@@ -226,6 +226,9 @@ MonoBehaviour:
   _placeAnimationDuration: 0.2
   _placeAnimationScale: 1.1428572
   _moveAnimationDuration: 0.15
+  _mergeAnimationDuration: 0.3
+  _mergeAnimationScale: 1.1428572
+  _removeAnimationDuration: 0.15
 --- !u!212 &1959014139329216650
 SpriteRenderer:
   m_ObjectHideFlags: 0

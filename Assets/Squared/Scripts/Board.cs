@@ -55,21 +55,17 @@ namespace Squared
         private void PlaceInitialTiles()
         {
             // TEMPORARY LOGIC; REPLACE LATER
-            //for (int i = 0; i < 4; i++)
-            //{
-            //    Vector2Int position = new Vector2Int(Random.Range(0, _boardSize.x), Random.Range(0, _boardSize.y));
+            for (int i = 0; i < 4; i++)
+            {
+                Vector2Int position = new Vector2Int(Random.Range(0, _boardSize.x), Random.Range(0, _boardSize.y));
 
-            //    while (_tilesByPosition.ContainsKey(position))
-            //    {
-            //        position = new Vector2Int(Random.Range(0, _boardSize.x), Random.Range(0, _boardSize.y));
-            //    }
+                while (_tilesByPosition.ContainsKey(position))
+                {
+                    position = new Vector2Int(Random.Range(0, _boardSize.x), Random.Range(0, _boardSize.y));
+                }
 
-            //    PlaceTile(_tileSOs[0], position);
-            //}
-            PlaceTile(_tileSOs[0], new Vector2Int(0, 0));
-            PlaceTile(_tileSOs[0], new Vector2Int(1, 1));
-            PlaceTile(_tileSOs[0], new Vector2Int(2, 2));
-            PlaceTile(_tileSOs[0], new Vector2Int(3, 3));
+                PlaceTile(_tileSOs[0], position);
+            }
         }
 
         private Vector3 BoardToWorldPosition(Vector2Int boardPosition)
@@ -105,11 +101,6 @@ namespace Squared
             _tiles.Add(tile);
             _tilesByPosition[position] = tile;
         }
-
-        private void MergeTiles(List<Tile> tiles)
-        {
-
-        }
         #endregion
 
         #region Public Methods
@@ -129,8 +120,17 @@ namespace Squared
                 {
                     if (_tilesByPosition.ContainsKey(tile.NextBoardPosition))
                     {
-                        Debug.Log($"Attempt merge with tile at {tile.NextBoardPosition}");
+                        Tile otherTile = _tilesByPosition[tile.NextBoardPosition];
                         movableTiles.RemoveAt(i);
+
+                        if (tile.Data.BaseNumber == otherTile.Data.BaseNumber && tile.Power == otherTile.Power)
+                        {
+                            otherTile.NextPower++;
+                            tile.Remove();
+                            _inactiveTiles[tile.Data].Push(tile);
+                            _tilesByPosition.Remove(tile.BoardPosition);
+                            _tiles.Remove(tile);
+                        }
                     }
                     else
                     {
@@ -154,11 +154,23 @@ namespace Squared
                 }
             }
 
-            foreach (var tile in _tiles)
+            for (int i = _tiles.Count - 1; i >= 0; i--)
             {
+                Tile tile = _tiles[i];
+
                 if (tile.BoardPosition != tile.NextBoardPosition)
                 {
                     tile.Move(BoardToWorldPosition(tile.BoardPosition), tile.BoardPosition);
+                }
+
+                if (tile.Power != tile.NextPower)
+                {
+                    if (tile.SetPower(tile.NextPower))
+                    {
+                        _inactiveTiles[tile.Data].Push(tile);
+                        _tilesByPosition.Remove(tile.BoardPosition);
+                        _tiles.RemoveAt(i);
+                    }
                 }
             }
         }
