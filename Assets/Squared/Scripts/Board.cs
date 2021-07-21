@@ -55,17 +55,21 @@ namespace Squared
         private void PlaceInitialTiles()
         {
             // TEMPORARY LOGIC; REPLACE LATER
-            for (int i = 0; i < 4; i++)
-            {
-                Vector2Int position = new Vector2Int(Random.Range(0, _boardSize.x), Random.Range(0, _boardSize.y));
+            //for (int i = 0; i < 4; i++)
+            //{
+            //    Vector2Int position = new Vector2Int(Random.Range(0, _boardSize.x), Random.Range(0, _boardSize.y));
 
-                while (_tilesByPosition.ContainsKey(position))
-                {
-                    position = new Vector2Int(Random.Range(0, _boardSize.x), Random.Range(0, _boardSize.y));
-                }
+            //    while (_tilesByPosition.ContainsKey(position))
+            //    {
+            //        position = new Vector2Int(Random.Range(0, _boardSize.x), Random.Range(0, _boardSize.y));
+            //    }
 
-                PlaceTile(_tileSOs[0], position);
-            }
+            //    PlaceTile(_tileSOs[0], position);
+            //}
+            PlaceTile(_tileSOs[0], new Vector2Int(0, 0));
+            PlaceTile(_tileSOs[0], new Vector2Int(1, 1));
+            PlaceTile(_tileSOs[0], new Vector2Int(2, 2));
+            PlaceTile(_tileSOs[0], new Vector2Int(3, 3));
         }
 
         private Vector3 BoardToWorldPosition(Vector2Int boardPosition)
@@ -101,78 +105,155 @@ namespace Squared
             _tiles.Add(tile);
             _tilesByPosition[position] = tile;
         }
+
+        private void TrySlideTile(Vector2Int position, Vector2Int direction)
+        {
+            Tile tile = _tilesByPosition[position];
+            tile.NextBoardPosition = position;
+            Vector2Int nextPosition = position + direction;
+            bool shouldMerge = false;
+
+            while (nextPosition.x >= 0 && nextPosition.x < _boardSize.x
+                && nextPosition.y >= 0 && nextPosition.y < _boardSize.y)
+            {
+                tile.NextBoardPosition = nextPosition;
+                if (_tilesByPosition.ContainsKey(nextPosition))
+                {
+                    Debug.Log("Attempt merge or stop");
+                    shouldMerge = true;
+                    break;
+                }
+                else nextPosition += direction;
+            }
+
+            if (!shouldMerge)
+            {
+                _tilesByPosition.Remove(tile.BoardPosition);
+                tile.Move(BoardToWorldPosition(tile.NextBoardPosition), tile.NextBoardPosition);
+                _tilesByPosition.Add(tile.BoardPosition, tile);
+            }
+        }
         #endregion
 
         #region Public Methods
         public void SlideTiles(Vector2Int direction)
         {
-            List<Tile> movableTiles = new List<Tile>(_tiles);
-            int slideIteration = 0;
-
-            for (int i = movableTiles.Count - 1; i >= -1; i--)
+            if (direction.x == -1)
             {
-                if (movableTiles.Count == 1) i = 0;
-                Tile tile = movableTiles[i];
-                if (slideIteration == 0) tile.NextBoardPosition = tile.BoardPosition + direction;
-
-                if (tile.NextBoardPosition.x >= 0 && tile.NextBoardPosition.x < _boardSize.x
-                    && tile.NextBoardPosition.y >= 0 && tile.NextBoardPosition.y < _boardSize.y)
+                for (int x = 1; x < _boardSize.x; x++)
                 {
-                    if (_tilesByPosition.ContainsKey(tile.NextBoardPosition))
+                    for (int y = 0; y < _boardSize.y; y++)
                     {
-                        Tile otherTile = _tilesByPosition[tile.NextBoardPosition];
-                        movableTiles.RemoveAt(i);
-
-                        if (tile.Data.BaseNumber == otherTile.Data.BaseNumber && tile.Power == otherTile.Power)
-                        {
-                            otherTile.NextPower++;
-                            tile.Remove();
-                            _inactiveTiles[tile.Data].Push(tile);
-                            _tilesByPosition.Remove(tile.BoardPosition);
-                            _tiles.Remove(tile);
-                        }
-                    }
-                    else
-                    {
-                        _tilesByPosition.Remove(tile.BoardPosition);
-                        tile.BoardPosition = tile.NextBoardPosition;
-                        _tilesByPosition.Add(tile.BoardPosition, tile);
-                        tile.NextBoardPosition += direction;
-                    }
-                }
-                else
-                {
-                    movableTiles.RemoveAt(i);
-                }
-
-                if (i == 0)
-                {
-                    slideIteration++;
-                    int movableCount = movableTiles.Count;
-                    if (movableCount > 0) i = movableCount - 1;
-                    else break;
-                }
-            }
-
-            for (int i = _tiles.Count - 1; i >= 0; i--)
-            {
-                Tile tile = _tiles[i];
-
-                if (tile.BoardPosition != tile.NextBoardPosition)
-                {
-                    tile.Move(BoardToWorldPosition(tile.BoardPosition), tile.BoardPosition);
-                }
-
-                if (tile.Power != tile.NextPower)
-                {
-                    if (tile.SetPower(tile.NextPower))
-                    {
-                        _inactiveTiles[tile.Data].Push(tile);
-                        _tilesByPosition.Remove(tile.BoardPosition);
-                        _tiles.RemoveAt(i);
+                        Vector2Int position = new Vector2Int(x, y);
+                        if (!_tilesByPosition.ContainsKey(position)) continue;
+                        TrySlideTile(position, direction);
                     }
                 }
             }
+            else if (direction.x == 1)
+            {
+                for (int x = _boardSize.x - 2; x >= 0; x--)
+                {
+                    for (int y = 0; y < _boardSize.y; y++)
+                    {
+                        Vector2Int position = new Vector2Int(x, y);
+                        if (!_tilesByPosition.ContainsKey(position)) continue;
+                        TrySlideTile(position, direction);
+                    }
+                }
+            }
+            else if (direction.y == -1)
+            {
+                for (int y = 1; y < _boardSize.y; y++)
+                {
+                    for (int x = 0; x < _boardSize.x; x++)
+                    {
+                        Vector2Int position = new Vector2Int(x, y);
+                        if (!_tilesByPosition.ContainsKey(position)) continue;
+                        TrySlideTile(position, direction);
+                    }
+                }
+            }
+            else if (direction.y == 1)
+            {
+                for (int y = _boardSize.y - 2; y >= 0; y--)
+                {
+                    for (int x = 0; x < _boardSize.x; x++)
+                    {
+                        Vector2Int position = new Vector2Int(x, y);
+                        if (!_tilesByPosition.ContainsKey(position)) continue;
+                        TrySlideTile(position, direction);
+                    }
+                }
+            }
+
+            //List<Tile> movableTiles = new List<Tile>(_tiles);
+            //int slideIteration = 0;
+
+            //for (int i = movableTiles.Count - 1; i >= -1; i--)
+            //{
+            //    if (movableTiles.Count == 1) i = 0;
+            //    Tile tile = movableTiles[i];
+            //    if (slideIteration == 0) tile.NextBoardPosition = tile.BoardPosition + direction;
+
+            //    if (tile.NextBoardPosition.x >= 0 && tile.NextBoardPosition.x < _boardSize.x
+            //        && tile.NextBoardPosition.y >= 0 && tile.NextBoardPosition.y < _boardSize.y)
+            //    {
+            //        if (_tilesByPosition.ContainsKey(tile.NextBoardPosition))
+            //        {
+            //            Tile otherTile = _tilesByPosition[tile.NextBoardPosition];
+            //            movableTiles.RemoveAt(i);
+
+            //            if (tile.Data.BaseNumber == otherTile.Data.BaseNumber && tile.Power == otherTile.Power)
+            //            {
+            //                otherTile.NextPower++;
+            //                tile.Remove();
+            //                _inactiveTiles[tile.Data].Push(tile);
+            //                _tilesByPosition.Remove(tile.BoardPosition);
+            //                _tiles.Remove(tile);
+            //            }
+            //        }
+            //        else
+            //        {
+            //            _tilesByPosition.Remove(tile.BoardPosition);
+            //            tile.BoardPosition = tile.NextBoardPosition;
+            //            _tilesByPosition.Add(tile.BoardPosition, tile);
+            //            tile.NextBoardPosition += direction;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        movableTiles.RemoveAt(i);
+            //    }
+
+            //    if (i == 0)
+            //    {
+            //        slideIteration++;
+            //        int movableCount = movableTiles.Count;
+            //        if (movableCount > 0) i = movableCount - 1;
+            //        else break;
+            //    }
+            //}
+
+            //for (int i = _tiles.Count - 1; i >= 0; i--)
+            //{
+            //    Tile tile = _tiles[i];
+
+            //    if (tile.BoardPosition != tile.NextBoardPosition)
+            //    {
+            //        tile.Move(BoardToWorldPosition(tile.NextBoardPosition), tile.NextBoardPosition);
+            //    }
+
+            //    if (tile.Power != tile.NextPower)
+            //    {
+            //        if (tile.SetPower(tile.NextPower))
+            //        {
+            //            _inactiveTiles[tile.Data].Push(tile);
+            //            _tilesByPosition.Remove(tile.BoardPosition);
+            //            _tiles.RemoveAt(i);
+            //        }
+            //    }
+            //}
         }
         #endregion
     }
