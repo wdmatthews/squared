@@ -47,20 +47,6 @@ namespace Squared
         public bool RemoveAfterMove { get; set; }
         #endregion
 
-        #region Protected Methods
-        protected int Pow(int baseNumber, int power)
-        {
-            int result = baseNumber;
-
-            for (int i = 1; i < power; i++)
-            {
-                result *= baseNumber;
-            }
-
-            return result;
-        }
-        #endregion
-
         #region Public Methods
         public void Place(Vector3 worldPosition, TileSO data, Vector2Int boardPosition)
         {
@@ -90,7 +76,7 @@ namespace Squared
             }
 
             Power = power;
-            _baseNumber = Pow(_baseNumber, 2);
+            _baseNumber *= _baseNumber;
             _renderer.sprite = _powerSprites[Power - 1];
             _label.text = $"{_baseNumber}";
             transform.DOScale(_mergeAnimationScale, _mergeAnimationDuration / 2)
