@@ -21,6 +21,7 @@ namespace Squared
         private bool _rightArrowKeyWasPressed = false;
         private bool _downArrowKeyWasPressed = false;
         private bool _upArrowKeyWasPressed = false;
+        private bool _rKeyWasPressed = false;
         private bool _mouseWasPressed = false;
         private bool _screenWasTouched = false;
         private Vector2 _lastMousePosition = new Vector2();
@@ -38,6 +39,7 @@ namespace Squared
             bool rightArrowKeyIsPressed = Keyboard.current != null ? Keyboard.current.rightArrowKey.isPressed : false;
             bool downArrowKeyIsPressed = Keyboard.current != null ? Keyboard.current.downArrowKey.isPressed : false;
             bool upArrowKeyIsPressed = Keyboard.current != null ? Keyboard.current.upArrowKey.isPressed : false;
+            bool rKeyIsPressed = Keyboard.current != null ? Keyboard.current.rKey.isPressed : false;
             bool mouseIsPressed = Mouse.current != null ? Mouse.current.press.isPressed : false;
             bool screenIsTouched = Touchscreen.current != null ? Touchscreen.current.press.isPressed : false;
             Vector2 mousePosition = Mouse.current != null ? Mouse.current.position.ReadValue() : new Vector2();
@@ -86,6 +88,8 @@ namespace Squared
                 _board.SlideTiles(slideDirection);
             }
 
+            if (rKeyIsPressed && !_rKeyWasPressed) _board.Retry();
+
             _aKeyWasPressed = aKeyIsPressed;
             _dKeyWasPressed = dKeyIsPressed;
             _sKeyWasPressed = sKeyIsPressed;
@@ -94,6 +98,7 @@ namespace Squared
             _rightArrowKeyWasPressed = rightArrowKeyIsPressed;
             _downArrowKeyWasPressed = downArrowKeyIsPressed;
             _upArrowKeyWasPressed = upArrowKeyIsPressed;
+            _rKeyWasPressed = rKeyIsPressed;
             if (mouseIsPressed != _mouseWasPressed) _lastMousePosition = mousePosition;
             if (screenIsTouched != _screenWasTouched) _lastTouchPosition = touchPosition;
             _mouseWasPressed = mouseIsPressed;

@@ -33,6 +33,8 @@ namespace Squared
             {
                 _data = value;
                 _baseNumber = _data.BaseNumber;
+                if (_label) _label.text = $"{_baseNumber}";
+                if (_powerSprites.Length > 0) _renderer.sprite = _powerSprites[0];
                 Power = 1;
                 NextPower = 1;
                 RemoveAfterMove = false;

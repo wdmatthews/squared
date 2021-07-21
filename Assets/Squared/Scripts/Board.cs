@@ -11,8 +11,9 @@ namespace Squared
         [SerializeField] private SpriteRenderer _renderer = null;
         [SerializeField] private Vector2Int _boardSize = new Vector2Int(4, 4);
         [SerializeField] private TileSO[] _tileSOs = { };
-        [SerializeField] private float _slideCooldown = 1;
         [SerializeField] private LevelSO _levelSO = null;
+        [SerializeField] private float _slideCooldown = 1;
+        [SerializeField] private float _retryCooldown = 1;
         #endregion
 
         #region Runtime Fields
@@ -22,6 +23,8 @@ namespace Squared
         private Dictionary<Vector2Int, Tile> _tilesByPosition = new Dictionary<Vector2Int, Tile>();
         private Dictionary<TileSO, Stack<Tile>> _inactiveTiles = new Dictionary<TileSO, Stack<Tile>>();
         private float _slideCooldownTimer = 0;
+        private float _retryCooldownTimer = 0;
+        private bool _isRetrying = false;
         #endregion
 
         #region Properties
@@ -41,13 +44,23 @@ namespace Squared
         private void Start()
         {
             ReadTileSOs();
-            // TEMPORARY: Depends on game mode
-            PlaceInitialTiles(_levelSO.Tilemap);
+            StartLevel();
         }
 
         private void Update()
         {
             _slideCooldownTimer = Mathf.Clamp(_slideCooldownTimer - Time.deltaTime, 0, _slideCooldown);
+
+            if (_isRetrying)
+            {
+                _retryCooldownTimer = Mathf.Clamp(_retryCooldownTimer - Time.deltaTime, 0, _retryCooldown);
+
+                if (Mathf.Approximately(_retryCooldownTimer, 0))
+                {
+                    _isRetrying = false;
+                    StartLevel();
+                }
+            }
         }
         #endregion
 
@@ -76,6 +89,12 @@ namespace Squared
 
                 y--;
             }
+        }
+
+        private void StartLevel()
+        {
+            // TEMPORARY: Depends on game mode
+            PlaceInitialTiles(_levelSO.Tilemap);
         }
 
         private Vector3 BoardToWorldPosition(Vector2Int boardPosition)
@@ -119,12 +138,6 @@ namespace Squared
             _tilesByPosition.Remove(tile.BoardPosition);
             _tiles.Remove(tile);
             if (tile.Data.CanMerge) _standardTiles.Remove(tile);
-
-            // TEMPORARY: Depends on game mode
-            if (_standardTiles.Count == 0)
-            {
-                Debug.Log("Level completed!");
-            }
         }
 
         private void TrySlideTile(Vector2Int position, Vector2Int direction)
@@ -172,6 +185,15 @@ namespace Squared
             mergePosition.z = -tile2.NextPower;
             tile2.transform.position = mergePosition;
             RemoveTile(tile1);
+        }
+
+        private void CheckIfGameEnded()
+        {
+            // TEMPORARY: Depends on game mode
+            if (_standardTiles.Count == 0)
+            {
+                Debug.Log("Level completed!");
+            }
         }
         #endregion
 
@@ -236,9 +258,28 @@ namespace Squared
 
                 if (tile.NextPower != tile.Power)
                 {
-                    if (tile.SetPower(tile.NextPower)) RemoveTile(tile);
+                    if (tile.SetPower(tile.NextPower))
+                    {
+                        RemoveTile(tile);
+                        CheckIfGameEnded();
+                    }
                 }
             }
+        }
+
+        public void Retry()
+        {
+            if (_isRetrying) return;
+
+            for (int i = _tiles.Count - 1; i >= 0; i--)
+            {
+                Tile tile = _tiles[i];
+                tile.Remove();
+                RemoveTile(tile);
+            }
+
+            _isRetrying = true;
+            _retryCooldownTimer = _retryCooldown;
         }
         #endregion
     }
