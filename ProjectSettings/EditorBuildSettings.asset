@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Squared/Scenes/Game.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Squared/Scenes/Level Completed.unity
+    guid: a821da3a9261a4c71b9d7dc7ae95e71b
   m_configObjects: {}

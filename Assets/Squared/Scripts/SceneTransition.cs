@@ -26,7 +26,14 @@ namespace Squared
                 .OnComplete(onTransitionDone);
         }
 
-        public void TransitionTo(string sceneName) => Transition(() => SceneManager.LoadScene(sceneName));
+        public void TransitionTo(string sceneName)
+        {
+            Transition(() =>
+            {
+                DOTween.KillAll();
+                SceneManager.LoadScene(sceneName);
+            });
+        }
         #endregion
     }
 }

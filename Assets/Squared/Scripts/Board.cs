@@ -10,6 +10,7 @@ namespace Squared
         #region Inspector Fields
         public static int LevelSOIndex = 0;
         [SerializeField] private SpriteRenderer _renderer = null;
+        [SerializeField] private SceneTransition _sceneTransition = null;
         [SerializeField] private Vector2Int _boardSize = new Vector2Int(4, 4);
         [SerializeField] private TileSO[] _tileSOs = { };
         [SerializeField] private float _slideCooldown = 1;
@@ -189,11 +190,7 @@ namespace Squared
 
         private void CheckIfGameEnded()
         {
-            if (_standardTiles.Count == 0)
-            {
-                // TODO: Show win screen
-                Debug.Log("Level completed!");
-            }
+            if (_standardTiles.Count == 0) _sceneTransition.TransitionTo("Level Completed");
         }
         #endregion
 
