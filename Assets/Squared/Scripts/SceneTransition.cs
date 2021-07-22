@@ -32,6 +32,10 @@ namespace Squared
             {
                 DOTween.KillAll();
                 SceneManager.LoadScene(sceneName);
+
+                if (sceneName == "Menu") Audio.PlayMenu();
+                else if (sceneName == "Game") Audio.PlayGame();
+                else if (sceneName == "Level Completed") Audio.PlayLevelCompleted();
             });
         }
         #endregion

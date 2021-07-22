@@ -7,8 +7,11 @@ namespace Squared
     [DisallowMultipleComponent]
     public class Board : MonoBehaviour
     {
-        #region Inspector Fields
+        #region Static Fields
         public static int LevelSOIndex = 0;
+        #endregion
+
+        #region Inspector Fields
         [SerializeField] private SpriteRenderer _renderer = null;
         [SerializeField] private SceneTransition _sceneTransition = null;
         [SerializeField] private Vector2Int _boardSize = new Vector2Int(4, 4);
