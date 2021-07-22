@@ -17,6 +17,7 @@ namespace Squared
         [SerializeField] private Button _slideRightButton = null;
         [SerializeField] private Button _slideDownButton = null;
         [SerializeField] private Button _slideUpButton = null;
+        [SerializeField] private SceneTransition _sceneTransition = null;
         #endregion
 
         #region Runtime Fields
@@ -38,8 +39,7 @@ namespace Squared
         #region Unity Methods
         private void Awake()
         {
-            // TODO Send to menu
-            _menuButton.onClick.AddListener(() => Debug.Log("Menu"));
+            _menuButton.onClick.AddListener(() => _sceneTransition.TransitionTo("Menu"));
             _retryButton.onClick.AddListener(() => _board.Retry());
             _slideLeftButton.onClick.AddListener(() => _board.SlideTiles(new Vector2Int(-1, 0)));
             _slideRightButton.onClick.AddListener(() => _board.SlideTiles(new Vector2Int(1, 0)));
