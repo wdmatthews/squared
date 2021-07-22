@@ -8,12 +8,13 @@ namespace Squared
     public class Board : MonoBehaviour
     {
         #region Inspector Fields
+        public static int LevelSOIndex = 0;
         [SerializeField] private SpriteRenderer _renderer = null;
         [SerializeField] private Vector2Int _boardSize = new Vector2Int(4, 4);
         [SerializeField] private TileSO[] _tileSOs = { };
-        [SerializeField] private LevelSO _levelSO = null;
         [SerializeField] private float _slideCooldown = 1;
         [SerializeField] private float _retryCooldown = 1;
+        [SerializeField] private LevelSO[] _levelSOs = { };
         #endregion
 
         #region Runtime Fields
@@ -93,8 +94,7 @@ namespace Squared
 
         private void StartLevel()
         {
-            // TEMPORARY: Depends on game mode
-            PlaceInitialTiles(_levelSO.Tilemap);
+            PlaceInitialTiles(_levelSOs[LevelSOIndex].Tilemap);
         }
 
         private Vector3 BoardToWorldPosition(Vector2Int boardPosition)
@@ -189,9 +189,9 @@ namespace Squared
 
         private void CheckIfGameEnded()
         {
-            // TEMPORARY: Depends on game mode
             if (_standardTiles.Count == 0)
             {
+                // TODO: Show win screen
                 Debug.Log("Level completed!");
             }
         }
